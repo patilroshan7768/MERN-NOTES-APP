@@ -13,10 +13,10 @@ function App() {
 
   async function fetchNotes() {
     try {
-      const res = await getNotes();
-      setNotes(res.data);
+      const data = await getNotes();
+      setNotes(data);
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching notes:", err);
     }
   }
 
@@ -28,17 +28,17 @@ function App() {
 
     try {
       if (editingId) {
-        const res = await updateNote(editingId, title, content);
-        setNotes(notes.map(n => (n._id === editingId ? res.data : n)));
+        const updated = await updateNote(editingId, title, content);
+        setNotes(notes.map(n => (n._id === editingId ? updated : n)));
         setEditingId(null);
       } else {
-        const res = await addNote(title, content);
-        setNotes([res.data, ...notes]);
+        const newNote = await addNote(title, content);
+        setNotes([newNote, ...notes]);
       }
       setTitle("");
       setContent("");
     } catch (err) {
-      console.error(err);
+      console.error("Error saving note:", err);
     }
   }
 
@@ -55,14 +55,16 @@ function App() {
       await deleteNote(id);
       setNotes(notes.filter(n => n._id !== id));
     } catch (err) {
-      console.error(err);
+      console.error("Error deleting note:", err);
     }
   }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
       <div className="w-full max-w-2xl bg-white rounded-2xl shadow-lg p-6">
-        <h1 className="text-3xl font-bold mb-6 text-center text-indigo-600">📝 Notes App</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center text-indigo-600">
+          📝 Notes App
+        </h1>
 
         <div className="mb-6">
           <input
@@ -101,7 +103,10 @@ function App() {
 
         <ul className="space-y-4">
           {notes.map((n) => (
-            <li key={n._id} className="border rounded-lg p-4 bg-gray-50 shadow-sm">
+            <li
+              key={n._id}
+              className="border rounded-lg p-4 bg-gray-50 shadow-sm"
+            >
               <div className="flex justify-between items-center mb-2">
                 <h2 className="font-semibold text-lg">{n.title}</h2>
                 <span className="text-sm text-gray-500">
